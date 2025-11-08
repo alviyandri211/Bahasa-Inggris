@@ -18,12 +18,25 @@
         background: #222;
         padding: 25px;
         border-radius: 12px;
-        width: 350px;
+        width: 380px;
         text-align: center;
-        box-shadow: 0 0 20px #fff3;
+        box-shadow: 0 0 25px #fff5;
+    }
+    h2 { margin-top: 0; }
+    #timer {
+        font-size: 40px;
+        font-weight: bold;
+        color: #ff3333;
+        margin: 10px 0;
+        text-shadow: 0 0 10px #ff0000;
+    }
+    #score {
+        font-size: 18px;
+        margin-bottom: 10px;
+        color: #00ff99;
     }
     button {
-        padding: 10px 20px;
+        padding: 10px 15px;
         margin-top: 10px;
         font-size: 16px;
         cursor: pointer;
@@ -33,15 +46,15 @@
     .start-btn { background: #2980b9; color: white; }
     .answer-btn { background: #444; color: white; display: block; width: 100%; margin-top: 10px; }
     .answer-btn:hover { background: #666; }
-    #timer { font-size: 22px; margin: 10px 0; color: #ff4444; }
 </style>
 </head>
 <body>
 
 <div class="game-box">
     <h2>Game Bahasa Inggris</h2>
-    <div id="timer">Waktu: 10</div>
-    <div id="question">Klik start</div>
+    <div id="score">Skor: 0</div>
+    <div id="timer">10</div>
+    <div id="question">Klik Start untuk mulai</div>
     <div id="answers"></div>
     <button class="start-btn" onclick="startGame()">Start</button>
 </div>
@@ -63,18 +76,20 @@ let timer;
 function startGame() {
     index = 0;
     score = 0;
+    document.getElementById("score").innerText = "Skor: " + score;
     nextQuestion();
 }
 
 function nextQuestion() {
     if (index >= questions.length) {
-        document.getElementById("question").innerHTML = `Selesai! Skor kamu: ${score}/${questions.length}`;
+        document.getElementById("question").innerHTML = `<b>Selesai!</b><br>Skor Akhir: ${score}/${questions.length}`;
         document.getElementById("answers").innerHTML = "";
+        clearInterval(timer);
         return;
     }
 
     time = 10;
-    document.getElementById("timer").innerText = "Waktu: " + time;
+    document.getElementById("timer").innerText = time;
     clearInterval(timer);
     timer = setInterval(countdown, 1000);
 
@@ -90,13 +105,15 @@ function nextQuestion() {
 
     document.getElementById("answers").innerHTML = "";
     options.forEach(opt => {
-        document.getElementById("answers").innerHTML += `<button class="answer-btn" onclick="answer('${opt}')">${opt}</button>`;
+        document.getElementById("answers").innerHTML += 
+        `<button class="answer-btn" onclick="answer('${opt}')">${opt}</button>`;
     });
 }
 
 function answer(selected) {
     if (selected === questions[index][1]) {
         score++;
+        document.getElementById("score").innerText = "Skor: " + score;
     }
     index++;
     nextQuestion();
@@ -104,7 +121,7 @@ function answer(selected) {
 
 function countdown() {
     time--;
-    document.getElementById("timer").innerText = "Waktu: " + time;
+    document.getElementById("timer").innerText = time;
     if (time <= 0) {
         index++;
         nextQuestion();
