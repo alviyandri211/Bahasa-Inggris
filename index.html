@@ -1,133 +1,505 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Game Bahasa Inggris</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>English Quiz - Tournament UI</title>
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #111;
-        color: white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-    }
-    .game-box {
-        background: #222;
-        padding: 25px;
-        border-radius: 12px;
-        width: 380px;
-        text-align: center;
-        box-shadow: 0 0 25px #fff5;
-    }
-    h2 { margin-top: 0; }
-    #timer {
-        font-size: 40px;
-        font-weight: bold;
-        color: #ff3333;
-        margin: 10px 0;
-        text-shadow: 0 0 10px #ff0000;
-    }
-    #score {
-        font-size: 18px;
-        margin-bottom: 10px;
-        color: #00ff99;
-    }
-    button {
-        padding: 10px 15px;
-        margin-top: 10px;
-        font-size: 16px;
-        cursor: pointer;
-        border: none;
-        border-radius: 6px;
-    }
-    .start-btn { background: #2980b9; color: white; }
-    .answer-btn { background: #444; color: white; display: block; width: 100%; margin-top: 10px; }
-    .answer-btn:hover { background: #666; }
+  :root{
+    --bg:#061226;
+    --card:#0b2036;
+    --accent:#1fb6ff;
+    --accent-2:#00d1b2;
+    --muted:#9fb3c8;
+    --danger:#ff3860;
+    --neon: 0 6px 20px rgba(31,182,255,0.12);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100vh;
+    background: linear-gradient(180deg, #021027 0%, #061226 60%);
+    font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+    color:#e6f7ff; display:flex; align-items:center; justify-content:center;
+    padding:30px;
+  }
+
+  .stage{
+    width:980px; max-width:100%;
+    display:grid; grid-template-columns: 1fr 380px; gap:22px;
+  }
+
+  /* LEFT - Game area */
+  .card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:14px; padding:20px; box-shadow: var(--neon);
+    border:1px solid rgba(255,255,255,0.03);
+  }
+
+  .question-area{
+    padding:18px; border-radius:10px; background:linear-gradient(90deg, rgba(31,182,255,0.04), rgba(0,209,178,0.02));
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+  }
+
+  .top-bar{
+    width:100%; display:flex; justify-content:space-between; align-items:center; gap:10px;
+  }
+  .meta{
+    display:flex; gap:12px; align-items:center;
+  }
+  .meta .pill{
+    background: rgba(255,255,255,0.03); padding:8px 12px; border-radius:999px; color:var(--muted); font-weight:600; font-size:14px;
+    display:flex; gap:8px; align-items:center;
+  }
+  #score { color: #9ef2b4; font-weight:700; }
+  #levelPill { color: var(--accent); font-weight:700; }
+
+  /* timer bar */
+  .timer-wrap{ width:100%; margin-top:8px; }
+  .timer-bar {
+    height:10px; background:rgba(255,255,255,0.06); border-radius:8px; overflow:hidden;
+  }
+  .timer-fill {
+    height:100%; width:100%; background:linear-gradient(90deg,var(--accent), #00e0a3);
+    transform-origin:left; transition:width 0.25s linear;
+  }
+
+  /* big timer */
+  #timerBig {
+    font-size:64px; font-weight:800; letter-spacing:1px; margin:6px 0;
+    color:var(--accent); text-shadow: 0 0 18px rgba(31,182,255,0.14);
+    transition: transform 0.15s ease;
+  }
+  .pulse {
+    animation: pulseScale 0.9s ease-in-out infinite;
+  }
+  @keyframes pulseScale {
+    0%{ transform: scale(1); }
+    50%{ transform: scale(1.08); }
+    100%{ transform: scale(1); }
+  }
+
+  /* question */
+  #questionText { font-size:22px; font-weight:700; text-align:center; color:#eaf8ff; margin:8px 0 0; }
+  #subText { color:var(--muted); font-size:14px; margin-top:4px; }
+
+  /* answers grid */
+  .answers { width:100%; display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px; }
+  .btn {
+    padding:14px; border-radius:10px; border:1px solid rgba(255,255,255,0.03); background:#0e2b44;
+    color:#e6f7ff; font-weight:700; cursor:pointer; font-size:15px; transition: transform .12s ease, box-shadow .12s;
+  }
+  .btn:hover { transform: translateY(-3px); box-shadow: 0 8px 18px rgba(0,0,0,0.5); }
+  .btn.correct { background: linear-gradient(90deg,#00e092,#00d1b2); color:#012b18; }
+  .btn.wrong { background: linear-gradient(90deg,#ff5c78,#ff3b69); color:white; }
+
+  /* right panel - scoreboard / info */
+  .side {
+    display:flex; flex-direction:column; gap:14px;
+  }
+  .panel {
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:12px; padding:16px; border:1px solid rgba(255,255,255,0.03);
+  }
+  .panel h3 { margin:0 0 8px; font-size:16px; color:var(--muted); }
+  .bigscore { font-size:40px; font-weight:900; color:#9ef2b4; text-align:center; margin-top:6px; }
+
+  .small { font-size:13px; color:var(--muted); }
+
+  .controls { display:flex; gap:10px; align-items:center; justify-content:center; margin-top:8px; }
+  .smallbtn { padding:8px 12px; border-radius:8px; background:rgba(255,255,255,0.03); color:var(--muted); border:none; cursor:pointer; }
+
+  .footerNote { font-size:12px; color:var(--muted); text-align:center; margin-top:12px; }
+
+  /* responsive */
+  @media(max-width:980px){
+    .stage{ grid-template-columns: 1fr; }
+    .side { order:2; }
+  }
 </style>
 </head>
 <body>
 
-<div class="game-box">
-    <h2>Game Bahasa Inggris</h2>
-    <div id="score">Skor: 0</div>
-    <div id="timer">10</div>
-    <div id="question">Klik Start untuk mulai</div>
-    <div id="answers"></div>
-    <button class="start-btn" onclick="startGame()">Start</button>
+<div class="stage">
+  <!-- LEFT: game -->
+  <div class="card">
+    <div class="question-area">
+      <div class="top-bar" style="width:100%">
+        <div class="meta">
+          <div class="pill" id="levelPill">Level 1</div>
+          <div class="pill" id="scorePill">Score: 0</div>
+        </div>
+        <div class="meta">
+          <div class="pill small" id="modePill">Mode: Auto</div>
+        </div>
+      </div>
+
+      <div class="timer-wrap" style="width:100%">
+        <div class="timer-bar"><div class="timer-fill" id="timerFill"></div></div>
+      </div>
+
+      <div id="timerBig">10</div>
+      <div id="questionText">Klik <b>Start</b> untuk mulai</div>
+      <div id="subText" class="small">Soal bisa: Indonesia → Inggris atau Inggris → Indonesia</div>
+
+      <div class="answers" id="answersArea" style="margin-top:18px"></div>
+
+      <div style="margin-top:14px">
+        <button class="btn" id="startBtn">Start Game</button>
+        <button class="btn" id="skipBtn" style="margin-left:10px; display:none; background:rgba(255,255,255,0.04)">Skip</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: side panels -->
+  <div class="side">
+    <div class="panel">
+      <h3>Scoreboard</h3>
+      <div class="bigscore" id="bigScore">0</div>
+      <div style="display:flex; justify-content:space-between; margin-top:12px">
+        <div>
+          <div class="small">Correct</div>
+          <div style="font-weight:800; color:#9ef2b4" id="correctCount">0</div>
+        </div>
+        <div>
+          <div class="small">Wrong</div>
+          <div style="font-weight:800; color:#ff7a94" id="wrongCount">0</div>
+        </div>
+      </div>
+      <div class="footerNote">Auto-level tiap 10 soal • Timer makin cepat tiap level</div>
+    </div>
+
+    <div class="panel">
+      <h3>Controls</h3>
+      <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap">
+        <button class="smallbtn" id="restartBtn">Restart</button>
+        <button class="smallbtn" id="toggleSound">Sound: ON</button>
+        <button class="smallbtn" id="showRemaining">Remaining</button>
+      </div>
+      <div style="margin-top:12px" class="small">
+        Remaining pool: <span id="remainingCount">--</span>
+      </div>
+    </div>
+  </div>
 </div>
 
+<!-- SOUNDS (base64 short beeps) -->
+<audio id="sCorrect" src="data:audio/wav;base64,UklGRjQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=" preload="auto"></audio>
+<audio id="sWrong"   src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=" preload="auto"></audio>
+<audio id="sTime"    src="data:audio/wav;base64,UklGRhAAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=" preload="auto"></audio>
+
 <script>
-const questions = [
-    ["kucing", "cat"], ["anjing", "dog"], ["burung", "bird"], ["kuda", "horse"], ["sapi", "cow"],
-    ["apel", "apple"], ["jeruk", "orange"], ["pisang", "banana"], ["anggur", "grape"], ["semangka", "watermelon"],
-    ["kursi", "chair"], ["meja", "table"], ["pintu", "door"], ["jendela", "window"], ["buku", "book"],
-    ["sekolah", "school"], ["rumah", "house"], ["toko", "store"], ["gereja", "church"], ["kantor", "office"],
-    ["makan", "eat"], ["minum", "drink"], ["lari", "run"], ["tidur", "sleep"], ["menulis", "write"]
+/* -------------------------
+   Data & initial settings
+   ------------------------- */
+const wordPool = [
+  // animals 20
+  ["kucing","cat"],["anjing","dog"],["gajah","elephant"],["kuda","horse"],["sapi","cow"],
+  ["burung","bird"],["ikan","fish"],["kambing","goat"],["ayam","chicken"],["kambing","goat"],
+  ["ular","snake"],["kupu-kupu","butterfly"],["kelinci","rabbit"],["singa","lion"],["harimau","tiger"],
+  ["gajah laut","seal"],["paus","whale"],["delfin","dolphin"],["beruang","bear"],["zebra","zebra"],
+  // objects 15
+  ["meja","table"],["kursi","chair"],["pintu","door"],["jendela","window"],["buku","book"],
+  ["pulpen","pen"],["tas","bag"],["komputer","computer"],["laptop","laptop"],["piring","plate"],
+  ["gelas","glass"],["bantal","pillow"],["jam","clock"],["kunci","key"],["kacamata","glasses"],
+  // fruits 15
+  ["apel","apple"],["pisang","banana"],["jeruk","orange"],["mangga","mango"],["anggur","grape"],
+  ["nanas","pineapple"],["semangka","watermelon"],["pepaya","papaya"],["kiwi","kiwi"],["stroberi","strawberry"],
+  ["blueberry","blueberry"],["durian","durian"],["rambutan","rambutan"],["salak","salak"],["pisang raja","plantain"],
+  // buildings 15
+  ["rumah","house"],["sekolah","school"],["rumah sakit","hospital"],["kantor","office"],["toko","shop"],
+  ["masjid","mosque"],["gereja","church"],["bank","bank"],["hotel","hotel"],["restoran","restaurant"],
+  ["perpustakaan","library"],["stasiun","station"],["bandara","airport"],["museum","museum"],["studio","studio"],
+  // verbs 15
+  ["makan","eat"],["minum","drink"],["tidur","sleep"],["lari","run"],["berjalan","walk"],
+  ["membaca","read"],["menulis","write"],["berbicara","speak"],["mendengarkan","listen"],["melihat","see"],
+  ["memasak","cook"],["membersihkan","clean"],["berenang","swim"],["mengendarai","drive"],["melompat","jump"]
 ];
 
-let index = 0;
+// clone pool so original stays intact if needed
+let pool = wordPool.slice();
+
+/* game state */
 let score = 0;
-let time = 10;
-let timer;
+let correctCount = 0, wrongCount = 0;
+let level = 1;
+let perLevel = 10; // soal per level
+let asked = 0; // total asked
+let currentCorrect = "";
+let currentMode = "ID-EN"; // or EN-ID
+let timeLeft = 10;
+let baseTime = 10; // starting time
+let timerId = null;
+let soundOn = true;
 
-function startGame() {
-    index = 0;
-    score = 0;
-    document.getElementById("score").innerText = "Skor: " + score;
-    nextQuestion();
+/* DOM */
+const startBtn = document.getElementById("startBtn");
+const skipBtn = document.getElementById("skipBtn");
+const timerBig = document.getElementById("timerBig");
+const timerFill = document.getElementById("timerFill");
+const questionText = document.getElementById("questionText");
+const answersArea = document.getElementById("answersArea");
+const scorePill = document.getElementById("scorePill");
+const levelPill = document.getElementById("levelPill");
+const bigScore = document.getElementById("bigScore");
+const correctEl = document.getElementById("correctCount");
+const wrongEl = document.getElementById("wrongCount");
+const remainingCount = document.getElementById("remainingCount");
+const modePill = document.getElementById("modePill");
+const sCorrect = document.getElementById("sCorrect");
+const sWrong = document.getElementById("sWrong");
+const sTime = document.getElementById("sTime");
+const restartBtn = document.getElementById("restartBtn");
+const toggleSound = document.getElementById("toggleSound");
+const showRemaining = document.getElementById("showRemaining");
+
+/* set initial UI */
+updateUI();
+
+// small helper - pick & remove random from pool
+function popRandom(arr){
+  if(arr.length===0) return null;
+  const i = Math.floor(Math.random()*arr.length);
+  return arr.splice(i,1)[0];
 }
 
-function nextQuestion() {
-    if (index >= questions.length) {
-        document.getElementById("question").innerHTML = `<b>Selesai!</b><br>Skor Akhir: ${score}/${questions.length}`;
-        document.getElementById("answers").innerHTML = "";
-        clearInterval(timer);
-        return;
-    }
-
-    time = 10;
-    document.getElementById("timer").innerText = time;
-    clearInterval(timer);
-    timer = setInterval(countdown, 1000);
-
-    const q = questions[index];
-    document.getElementById("question").innerHTML = `Apa Bahasa Inggris dari: <b>${q[0]}</b>?`;
-
-    let options = [q[1]];
-    while (options.length < 4) {
-        let random = questions[Math.floor(Math.random() * questions.length)][1];
-        if (!options.includes(random)) options.push(random);
-    }
-    options.sort(() => Math.random() - 0.5);
-
-    document.getElementById("answers").innerHTML = "";
-    options.forEach(opt => {
-        document.getElementById("answers").innerHTML += 
-        `<button class="answer-btn" onclick="answer('${opt}')">${opt}</button>`;
-    });
+function startGame(){
+  // reset
+  pool = wordPool.slice();
+  score = 0; correctCount = 0; wrongCount = 0; level = 1; asked = 0;
+  startBtn.style.display = "none";
+  skipBtn.style.display = "inline-block";
+  updateUI();
+  nextRound();
 }
 
-function answer(selected) {
-    if (selected === questions[index][1]) {
-        score++;
-        document.getElementById("score").innerText = "Skor: " + score;
-    }
-    index++;
-    nextQuestion();
+function updateUI(){
+  scorePill.innerText = "Score: " + score;
+  levelPill.innerText = "Level " + level;
+  bigScore.innerText = score;
+  correctEl.innerText = correctCount;
+  wrongEl.innerText = wrongCount;
+  remainingCount.innerText = pool.length;
+  timerBig.innerText = timeLeft;
+  modePill.innerText = "Mode: Auto";
 }
 
-function countdown() {
-    time--;
-    document.getElementById("timer").innerText = time;
-    if (time <= 0) {
-        index++;
-        nextQuestion();
-    }
+// compute time based on level (tension)
+function computeTimeForLevel(lv){
+  // decrease time gradually but not below 4
+  let t = Math.max(4, baseTime - Math.floor((lv-1)*1.5));
+  return t;
 }
+
+function nextRound(){
+  // stop any previous timer
+  clearInterval(timerId);
+  timerId = null;
+
+  if(pool.length === 0){
+    // finished all words
+    questionText.innerHTML = "<b>Semua soal sudah selesai!</b>";
+    answersArea.innerHTML = "";
+    startBtn.style.display = "inline-block";
+    skipBtn.style.display = "none";
+    return;
+  }
+
+  // level up every perLevel asked
+  if(asked > 0 && asked % perLevel === 0){
+    level++;
+  }
+
+  // choose random word and remove it (so not repeated)
+  const word = popRandom(pool);
+  if(!word){
+    // no more
+    questionText.innerHTML = "<b>Semua soal sudah selesai!</b>";
+    answersArea.innerHTML = "";
+    return;
+  }
+
+  // choose mode randomly (50/50)
+  currentMode = Math.random() < 0.5 ? "ID-EN" : "EN-ID";
+  modePill.innerText = (currentMode === "ID-EN") ? "Mode: ID → EN" : "Mode: EN → ID";
+
+  let prompt, answer;
+  if(currentMode === "ID-EN"){
+    prompt = word[0]; answer = word[1];
+  } else {
+    prompt = word[1]; answer = word[0];
+  }
+  currentCorrect = answer;
+
+  // prepare options - always include correct
+  const opts = [answer];
+  while(opts.length < 4 && pool.length + opts.length >= 4){
+    // pick random from wordPool (original) to generate distractors
+    const r = wordPool[Math.floor(Math.random()*wordPool.length)];
+    const candidate = (currentMode === "ID-EN") ? r[1] : r[0];
+    if(!opts.includes(candidate)) opts.push(candidate);
+  }
+  // if still less than 4 (small pool), fill with random strings
+  while(opts.length < 4){
+    const filler = "—";
+    if(!opts.includes(filler)) opts.push(filler); else break;
+  }
+
+  // shuffle
+  opts.sort(()=>Math.random()-0.5);
+
+  // render
+  questionText.innerHTML = (currentMode === "ID-EN")
+    ? `Terjemahkan ke <b>Inggris</b>: <div style="font-size:20px;margin-top:6px"><b>${escapeHtml(prompt)}</b></div>`
+    : `Terjemahkan ke <b>Indonesia</b>: <div style="font-size:20px;margin-top:6px"><b>${escapeHtml(prompt)}</b></div>`;
+
+  answersArea.innerHTML = "";
+  opts.forEach(opt=>{
+    const btn = document.createElement("button");
+    btn.className = "btn";
+    btn.innerText = opt;
+    btn.onclick = ()=> handleAnswer(opt, answer, btn);
+    answersArea.appendChild(btn);
+  });
+
+  // set timer based on level
+  timeLeft = computeTimeForLevel(level);
+  updateTimerUI();
+
+  // animate timer bar
+  updateTimerBar();
+  startTimer();
+
+  asked++;
+  updateUI();
+}
+
+function handleAnswer(selected, correct, btn){
+  stopTimer();
+  // mark
+  if(selected === correct){
+    score += 10;
+    correctCount++;
+    btn.classList.add("correct");
+    playSound('correct');
+  } else {
+    wrongCount++;
+    btn.classList.add("wrong");
+    // also highlight correct one
+    const children = answersArea.children;
+    for(let i=0;i<children.length;i++){
+      if(children[i].innerText === correct){
+        children[i].classList.add("correct");
+      }
+    }
+    playSound('wrong');
+  }
+  // update UI
+  bigScore.innerText = score;
+  correctEl.innerText = correctCount;
+  wrongEl.innerText = wrongCount;
+  scorePill.innerText = "Score: " + score;
+
+  // after short delay, next
+  setTimeout(nextRound, 900);
+}
+
+function startTimer(){
+  stopTimer();
+  updateTimerUI();
+  timerId = setInterval(()=>{
+    timeLeft--;
+    if(timeLeft <= 0){
+      // time out
+      stopTimer();
+      // show correct highlight
+      const children = answersArea.children;
+      for(let i=0;i<children.length;i++){
+        if(children[i].innerText === currentCorrect){
+          children[i].classList.add("correct");
+        }
+      }
+      playSound('time');
+      wrongCount++;
+      wrongEl.innerText = wrongCount;
+      // small message
+      questionText.innerHTML += `<div style="margin-top:8px;color:var(--muted);font-size:13px">⏰ Waktu habis! Jawaban: <b>${escapeHtml(currentCorrect)}</b></div>`;
+      // after delay next
+      setTimeout(nextRound, 1000);
+    } else {
+      updateTimerUI();
+    }
+  }, 1000);
+}
+
+function stopTimer(){
+  if(timerId) clearInterval(timerId);
+  timerId = null;
+  // remove pulse class
+  timerBig.classList.remove('pulse');
+}
+
+function updateTimerUI(){
+  // big value
+  timerBig.innerText = timeLeft;
+  // pulse when <=3
+  if(timeLeft <= 3){
+    timerBig.classList.add('pulse');
+  } else {
+    timerBig.classList.remove('pulse');
+  }
+  // update fill percent
+  updateTimerBar();
+}
+
+function updateTimerBar(){
+  // fill perc = timeLeft / computeTimeForLevel(level)
+  const max = computeTimeForLevel(level);
+  const pct = Math.max(0, (timeLeft / max) * 100);
+  timerFill.style.width = pct + '%';
+}
+
+/* small helpers */
+function playSound(type){
+  if(!soundOn) return;
+  try{
+    if(type==='correct') { sCorrect.currentTime = 0; sCorrect.play(); }
+    if(type==='wrong')   { sWrong.currentTime = 0; sWrong.play(); }
+    if(type==='time')    { sTime.currentTime = 0; sTime.play(); }
+  }catch(e){}
+}
+
+function escapeHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* controls */
+startBtn.addEventListener('click', startGame);
+skipBtn.addEventListener('click', ()=>{
+  // skip current question (counts as wrong)
+  stopTimer();
+  wrongCount++; wrongEl.innerText = wrongCount;
+  playSound('time');
+  setTimeout(nextRound, 300);
+});
+restartBtn.addEventListener('click', ()=>{
+  // refresh pool and restart
+  pool = wordPool.slice();
+  score = 0; correctCount = 0; wrongCount = 0; level = 1; asked = 0;
+  updateUI();
+  nextRound();
+});
+toggleSound.addEventListener('click', ()=>{
+  soundOn = !soundOn;
+  toggleSound.innerText = "Sound: " + (soundOn ? "ON" : "OFF");
+});
+showRemaining.addEventListener('click', ()=>{
+  alert("Remaining words in pool: " + pool.length);
+});
+
+/* initial fill for remaining count */
+remainingCount.innerText = pool.length;
+
+/* END */
 </script>
-
 </body>
 </html>
