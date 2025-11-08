@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Tebak Kata Bahasa Inggris</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background: linear-gradient(135deg,#6dd5fa,#2980b9);
+        height: 100vh; margin:0;
+        display:flex; justify-content:center; align-items:center;
+    }
+    .game-box{
+        background:white; width:420px; padding:25px;
+        border-radius:15px; box-shadow:0 8px 20px #00000040;
+    }
+    input, select{
+        width:90%; padding:8px; margin-top:10px;
+        border-radius:5px; border:1px solid gray;
+    }
+    button{
+        margin-top:12px; padding:10px 20px;
+        background:#2980b9; color:white;
+        border:none; border-radius:6px; cursor:pointer;
+        font-weight:bold;
+    }
+    .result{ margin-top:15px; font-size:18px; font-weight:bold; min-height:28px; }
+    .level{ font-size:14px; margin-bottom:10px; }
+</style>
+</head>
+<body>
+
+<div class="game-box">
+    <h2>Tebak Kata Bahasa Inggris → Indonesia</h2>
+    <p class="level" id="level"></p>
+    <p id="question"></p>
+    <input type="text" id="answer" placeholder="Masukkan jawaban (Bahasa Indonesia)...">
+    <button onclick="checkAnswer()">Cek Jawaban</button>
+    <p class="result" id="result"></p>
+</div>
+
+<script>
+let level = 1;
+
+// ===================== KOSAKATA =====================
+
+// HEWAN
+let animals = [
+["cat","kucing"],["dog","anjing"],["fish","ikan"],["bird","burung"],["horse","kuda"],["cow","sapi"],
+["goat","kambing"],["sheep","domba"],["tiger","harimau"],["lion","singa"],["monkey","monyet"],
+["elephant","gajah"],["giraffe","jerapah"],["zebra","zebra"],["rabbit","kelinci"],["frog","katak"],
+["snake","ular"],["crocodile","buaya"],["duck","bebek"],["goose","angsa"]
+].map(([eng,indo])=>({eng, indo}));
+
+// BENDA
+let objects = [
+["table","meja"],["chair","kursi"],["door","pintu"],["window","jendela"],["book","buku"],
+["pen","pulpen"],["pencil","pensil"],["eraser","penghapus"],["bag","tas"],["bed","kasur"],
+["cup","cangkir"],["glass","gelas"],["plate","piring"],["spoon","sendok"],["fork","garpu"],
+["lamp","lampu"],["phone","telepon"],["computer","komputer"],["laptop","laptop"],["clock","jam"]
+].map(([eng,indo])=>({eng, indo}));
+
+// BUAH
+let fruits = [
+["apple","apel"],["banana","pisang"],["orange","jeruk"],["mango","mangga"],["grape","anggur"],
+["watermelon","semangka"],["melon","melon"],["strawberry","stroberi"],["pineapple","nanas"],["papaya","pepaya"]
+].map(([eng,indo])=>({eng, indo}));
+
+// BANGUNAN
+let buildings = [
+["house","rumah"],["school","sekolah"],["hospital","rumah sakit"],["mosque","masjid"],
+["church","gereja"],["restaurant","restoran"],["hotel","hotel"],["bank","bank"],["airport","bandara"],["office","kantor"]
+].map(([eng,indo])=>({eng, indo}));
+
+// KATA KERJA
+let verbs = [
+["eat","makan"],["drink","minum"],["sleep","tidur"],["run","lari"],["walk","jalan"],
+["read","membaca"],["write","menulis"],["speak","berbicara"],["listen","mendengarkan"],["play","bermain"]
+].map(([eng,indo])=>({eng, indo}));
+
+// Level list
+let levels = [animals, objects, fruits, buildings, verbs];
+
+let currentList = levels[level-1];
+let currentWord;
+
+function updateLevelText(){
+    document.getElementById("level").innerHTML = "Level " + level;
+}
+
+function newWord() {
+    if(currentList.length === 0){
+        level++;
+        if(level > 5){
+            document.getElementById("question").innerHTML = "🎉 Semua level selesai!";
+            document.getElementById("answer").style.display="none";
+            return;
+        }
+        currentList = levels[level-1];
+        updateLevelText();
+    }
+    currentWord = currentList.splice(Math.floor(Math.random()*currentList.length),1)[0];
+    document.getElementById("question").innerHTML = "Terjemahkan kata: <b>" + currentWord.eng + "</b>";
+    document.getElementById("answer").value="";
+    document.getElementById("result").innerHTML="";
+}
+
+updateLevelText();
+newWord();
+
+function checkAnswer(){
+    let user = document.getElementById("answer").value.toLowerCase();
+    if(user === currentWord.indo){
+        document.getElementById("result").innerHTML = "✅ Benar!";
+    } else {
+        document.getElementById("result").innerHTML = "❌ Salah! Jawaban: " + currentWord.indo;
+    }
+    setTimeout(newWord,1000);
+}
+</script>
+
+</body>
+</html>
