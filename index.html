@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>English Quiz - Tournament UI</title>
+<title>Tes English - Turnamen</title>
 <style>
   :root{
     --bg:#061226;
@@ -203,8 +203,12 @@ const wordPool = [
   ["gelas","glass"],["bantal","pillow"],["jam","clock"],["kunci","key"],["kacamata","glasses"],
   // fruits 15
   ["apel","apple"],["pisang","banana"],["jeruk","orange"],["mangga","mango"],["anggur","grape"],
-  ["nanas","pineapple"],["semangka","watermelon"],["pepaya","papaya"],["kiwi","kiwi"],["stroberi","strawberry"],
-  ["blueberry","blueberry"],["durian","durian"],["rambutan","rambutan"],["salak","salak"],["pisang raja","plantain"],
+  ["nanas","pineapple"],["semangka","watermelon"],["pepaya","papaya"],["salak","snakefruit"],["stroberi","strawberry"],
+  ["blueberry","blueberry"],["durian","durian"],["alpukat","avocado"],["kelapa","coconut"],["jambu","guava"],
+  // colours 12
+  ["merah","red"],["biru","blue"],["kuning","yellow"],["hijau","green"],["hitam","black"],
+  ["putih","white"],["coklat","brown"],["abu-abu","gray"],["ungu","purple"],["oranye","orange"],
+  ["pink","pink"],["emas","gold"],
   // buildings 15
   ["rumah","house"],["sekolah","school"],["rumah sakit","hospital"],["kantor","office"],["toko","shop"],
   ["masjid","mosque"],["gereja","church"],["bank","bank"],["hotel","hotel"],["restoran","restaurant"],
@@ -212,7 +216,11 @@ const wordPool = [
   // verbs 15
   ["makan","eat"],["minum","drink"],["tidur","sleep"],["lari","run"],["berjalan","walk"],
   ["membaca","read"],["menulis","write"],["berbicara","speak"],["mendengarkan","listen"],["melihat","see"],
-  ["memasak","cook"],["membersihkan","clean"],["berenang","swim"],["mengendarai","drive"],["melompat","jump"]
+  ["memasak","cook"],["membersihkan","clean"],["berenang","swim"],["mengendarai","drive"],["melompat","jump"],
+  //transport
+  ["mobil","car"],["motor","motorcycle"],["sepeda","bicycle"],["bus","bus"],["truk","truck"],
+  ["kapal","ship"],["perahu","boat"],["pesawat","airplane"],["helikopter","helicopter"],["kereta","train"],
+  ["taksi","taxi"],["angkot","minibus"],["becak","rickshaw"],["skuter","scooter"],["kapal selam","submarine"]
 ];
 
 // clone pool so original stays intact if needed
@@ -330,19 +338,15 @@ function nextRound(){
   }
   currentCorrect = answer;
 
-  // prepare options - always include correct
+  // prepare options - always include correct (FIXED)
   const opts = [answer];
-  while(opts.length < 4 && pool.length + opts.length >= 4){
-    // pick random from wordPool (original) to generate distractors
-    const r = wordPool[Math.floor(Math.random()*wordPool.length)];
+  while (opts.length < 4) {
+    const r = wordPool[Math.floor(Math.random() * wordPool.length)];
     const candidate = (currentMode === "ID-EN") ? r[1] : r[0];
-    if(!opts.includes(candidate)) opts.push(candidate);
+    if (!opts.includes(candidate)) opts.push(candidate);
   }
-  // if still less than 4 (small pool), fill with random strings
-  while(opts.length < 4){
-    const filler = "—";
-    if(!opts.includes(filler)) opts.push(filler); else break;
-  }
+  // acak urutan opsi
+  opts.sort(() => Math.random() - 0.5);
 
   // shuffle
   opts.sort(()=>Math.random()-0.5);
